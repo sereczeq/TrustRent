@@ -1,4 +1,6 @@
 import React, {useState} from "react";
+import Autocomplete from '@mui/material/Autocomplete';
+import {TextField} from "@mui/material";
 
 interface country {
     id_country: number,
@@ -26,15 +28,21 @@ const AddressForm = () => {
 
     const [country, setCountry] = useState('');
     const [theCountry, setTheCountry] = useState<country | null>()
+    const [countries, setCountries] = useState<country[]>([])
 
-    const checkCountry = (event: React.FormEvent<HTMLInputElement>) => {
-        const name = event.currentTarget.value;
+    // const checkCountry = (event: React.FormEvent<HTMLInputElement>) => {
+    //     const name = event.currentTarget.value;
+    const checkCountry = (name: string | null) => {
+        // const name = event.currentTarget.value;
+        if(!name) name = '';
+        console.log("name", name)
         setCountry(name)
         fetch(`http://localhost:3000/api/address/${name}`)
             .then((response) => {
                     response.json().then((data) => {
-                        let countries = data as country[]
-                        if (countries.length === 1) {
+                        let c = data as country[]
+                        setCountries(c);
+                        if (countries.length !== 0) {
                             setTheCountry(countries[0]);
                         } else {
                             setTheCountry(null)
@@ -46,17 +54,22 @@ const AddressForm = () => {
 
     const [city, setCity] = useState('')
     const [theCity, setTheCity] = useState<city | null>(null);
+    const [cities, setCities] = useState<city[]>([])
 
-    const checkCity = (event: React.FormEvent<HTMLInputElement>) => {
-        const name = event.currentTarget.value;
+    // const checkCity = (event: React.FormEvent<HTMLInputElement>) => {
+    //     const name = event.currentTarget.value;
+    const checkCity = (name : string) =>
+    {
         setCity(name)
         if (!theCountry) return;
         fetch(`http://localhost:3000/api/address/${theCountry.id_country}/${name}`)
             .then((response) => {
                     response.json().then((data) => {
-                        let cities = data as city[]
-                        if (cities.length === 1) {
-                            setTheCity(cities[0]);
+                        let c = data as city[]
+                        setCities(c)
+                        console.log(cities)
+                        if (cities.length !== 0) {
+                            setTheCity(cities.reduce((a, b) => a.name.length <= b.name.length ? a : b));
                         } else {
                             setTheCity(null)
                         }
@@ -67,18 +80,21 @@ const AddressForm = () => {
 
     const [street, setStreet] = useState('')
     const [theStreet, setTheStreet] = useState<street | null>(null)
+    const [streets, setStreets] = useState<street[]>([])
 
-    const checkStreet = (event: React.FormEvent<HTMLInputElement>) => {
-        const name = event.currentTarget.value;
+    // const checkStreet = (event: React.FormEvent<HTMLInputElement>) => {
+    //     const name = event.currentTarget.value;
+    const checkStreet = (name : string) => {
         setStreet(name)
         if (!theCountry) return;
         if (!theCity) return;
         fetch(`http://localhost:3000/api/address/${theCountry.id_country}/${theCity.id_city}/${name}`)
             .then((response) => {
                     response.json().then((data) => {
-                        let streets = data as street[]
-                        if (streets.length === 1) {
-                            setTheStreet(streets[0]);
+                        let s = data as street[]
+                        setStreets(s)
+                        if (streets.length !== 0) {
+                            setTheStreet(streets.reduce((a, b) => a.name.length <= b.name.length ? a : b));
                         } else {
                             setTheStreet(null)
                         }
@@ -112,18 +128,53 @@ const AddressForm = () => {
 
     return (
         <div>
-            <label>
-            <input value={country} onChange={checkCountry}/>
-                 - country
-            </label>
+            <Autocomplete
+                inputValue={country}
+                onInputChange={(event, newInputValue) => {
+                    checkCountry(newInputValue);
+                }}
+                id="controllable-states-demo"
+                options={countries.map((country) => country.name)}
+                sx={{ width: 300 }}
+                renderInput={(params) => <TextField {...params} label="Country" />}
+            />
+            {/*<label>*/}
+            {/*<input value={country} onChange={checkCountry}/>*/}
+            {/*     - country*/}
+            {/*</label>*/}
             {theCountry ? <div>
-                <label>
-                <input value={city} onChange={checkCity}/>
-                - city</label>
+                <Autocomplete
+                    value={city}
+                    onChange={(event: any, newValue: string | null) => {
+                        if(newValue)
+                        checkCity(newValue);
+                    }}
+                    inputValue={city}
+                    onInputChange={(event, newInputValue) => {
+                        checkCity(newInputValue);
+                    }}
+                    id="controllable-states-demo"
+                    options={cities.map((city) => city.name)}
+                    sx={{ width: 300 }}
+                    renderInput={(params) => <TextField {...params} label="City" />}
+                />
+                {/*<label>*/}
+                {/*<input value={city} onChange={checkCity}/>*/}
+                {/*- city</label>*/}
                 {theCity ? <div>
-                    <label>
-                    <input value={street} onChange={checkStreet}/>
-                    - street</label>
+                    {/*<label>*/}
+                    {/*<input value={street} onChange={checkStreet}/>*/}
+                    {/*- street</label>*/}
+                    <Autocomplete
+                        inputValue={street}
+                        onInputChange={(event, newInputValue) => {
+                            checkStreet(newInputValue);
+                        }}
+                        id="controllable-states-demo"
+                        options={streets.map((street) => street.name)}
+                        sx={{ width: 300 }}
+                        renderInput={(params) => <TextField {...params} label="Street" />}
+                    />
                     {theStreet ? <div>
                         <label>
                         <input value={address} onChange={checkAddress}/>
