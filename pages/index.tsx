@@ -7,7 +7,7 @@ import {data} from "browserslist";
 import {GetServerSideProps, GetStaticProps, InferGetServerSidePropsType, InferGetStaticPropsType} from "next";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const res = await fetch('http://localhost:3001/api/user');
+    const res = await fetch(`http://localhost:3000/api/user`);
     const users: UserInterface[] = await res.json();
     return {
         props: {
@@ -24,6 +24,7 @@ export default function Home({users}: InferGetServerSidePropsType<typeof getServ
                 <div>
                     <p>{user.login}</p>
                     <p>{user.email}</p>
+                    <p>------------</p>
                 </div>
             )
             }
@@ -31,3 +32,4 @@ export default function Home({users}: InferGetServerSidePropsType<typeof getServ
 
     )
 }
+
