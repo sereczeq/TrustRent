@@ -34,7 +34,7 @@ const AddressForm = () => {
     //     const name = event.currentTarget.value;
     const checkCountry = (name: string | null) => {
         // const name = event.currentTarget.value;
-        if(!name) name = '';
+        if (!name) name = '';
         console.log("name", name)
         setCountry(name)
         fetch(`http://localhost:3000/api/address/${name}`)
@@ -58,8 +58,7 @@ const AddressForm = () => {
 
     // const checkCity = (event: React.FormEvent<HTMLInputElement>) => {
     //     const name = event.currentTarget.value;
-    const checkCity = (name : string) =>
-    {
+    const checkCity = (name: string) => {
         setCity(name)
         if (!theCountry) return;
         fetch(`http://localhost:3000/api/address/${theCountry.id_country}/${name}`)
@@ -84,7 +83,7 @@ const AddressForm = () => {
 
     // const checkStreet = (event: React.FormEvent<HTMLInputElement>) => {
     //     const name = event.currentTarget.value;
-    const checkStreet = (name : string) => {
+    const checkStreet = (name: string) => {
         setStreet(name)
         if (!theCountry) return;
         if (!theCity) return;
@@ -105,9 +104,9 @@ const AddressForm = () => {
 
     const [address, setAddress] = useState('')
     const [theAddress, setTheAddress] = useState<address | null>(null);
+    const [addresses, setAddresses] = useState<address[]>([])
 
-    const checkAddress = (event: React.FormEvent<HTMLInputElement>) => {
-        const name = event.currentTarget.value;
+    const checkAddress = (name : string) => {
         setAddress(name)
         if (!theCountry) return;
         if (!theCity) return;
@@ -115,9 +114,10 @@ const AddressForm = () => {
         fetch(`http://localhost:3000/api/address/${theCountry.id_country}/${theCity.id_city}/${theStreet.id_street}/${name}`)
             .then((response) => {
                     response.json().then((data) => {
-                        let addresses = data as address[]
-                        if (address.length === 1) {
-                            setTheAddress(addresses[0]);
+                        let a = data as address[]
+                        setAddresses(a)
+                        if (address.length !== 0) {
+                            setTheAddress(addresses.reduce((a, b) => a.number <= b.number ? a : b));
                         } else {
                             setTheAddress(null)
                         }
@@ -135,36 +135,21 @@ const AddressForm = () => {
                 }}
                 id="controllable-states-demo"
                 options={countries.map((country) => country.name)}
-                sx={{ width: 300 }}
-                renderInput={(params) => <TextField {...params} label="Country" />}
+                sx={{width: 300}}
+                renderInput={(params) => <TextField {...params} label="Country"/>}
             />
-            {/*<label>*/}
-            {/*<input value={country} onChange={checkCountry}/>*/}
-            {/*     - country*/}
-            {/*</label>*/}
             {theCountry ? <div>
                 <Autocomplete
-                    value={city}
-                    onChange={(event: any, newValue: string | null) => {
-                        if(newValue)
-                        checkCity(newValue);
-                    }}
                     inputValue={city}
                     onInputChange={(event, newInputValue) => {
                         checkCity(newInputValue);
                     }}
                     id="controllable-states-demo"
                     options={cities.map((city) => city.name)}
-                    sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label="City" />}
+                    sx={{width: 300}}
+                    renderInput={(params) => <TextField {...params} label="City"/>}
                 />
-                {/*<label>*/}
-                {/*<input value={city} onChange={checkCity}/>*/}
-                {/*- city</label>*/}
                 {theCity ? <div>
-                    {/*<label>*/}
-                    {/*<input value={street} onChange={checkStreet}/>*/}
-                    {/*- street</label>*/}
                     <Autocomplete
                         inputValue={street}
                         onInputChange={(event, newInputValue) => {
@@ -172,13 +157,20 @@ const AddressForm = () => {
                         }}
                         id="controllable-states-demo"
                         options={streets.map((street) => street.name)}
-                        sx={{ width: 300 }}
-                        renderInput={(params) => <TextField {...params} label="Street" />}
+                        sx={{width: 300}}
+                        renderInput={(params) => <TextField {...params} label="Street"/>}
                     />
                     {theStreet ? <div>
-                        <label>
-                        <input value={address} onChange={checkAddress}/>
-                        - number</label>
+                        <Autocomplete
+                            inputValue={address}
+                            onInputChange={(event, newInputValue) => {
+                                checkAddress(newInputValue);
+                            }}
+                            id="controllable-states-demo"
+                            options={addresses.map((address) => address.number)}
+                            sx={{width: 300}}
+                            renderInput={(params) => <TextField {...params} label="Number"/>}
+                        />
                         {theAddress ? <div>
                             <p>Your address
                                 is: {theCountry.name}, {theCity.name} ul. {theStreet.name} {theAddress.number}</p>
