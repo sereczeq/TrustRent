@@ -69,6 +69,7 @@ export default function Home() {
                     .then((data) => {
                         const o = data as Offer[]
                         setOffers(o)
+
                     })
             })
     }
@@ -194,6 +195,7 @@ export default function Home() {
                         <p>price - {offer.price}</p>
                         <p>stars - {offer.stars}</p>
                         <p>match - {offer.match}</p>
+                        <p>id - {offer.id_offer}</p>
                         <br/>
                     </div>)}
             </div>

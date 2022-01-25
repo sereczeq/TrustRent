@@ -19,7 +19,7 @@ const sql = 'SELECT o.id_offer,\n' +
     '    ORDER BY id_offer, date DESC\n' +
     ') AS ph ON o.id_offer = ph.id_offer\n' +
     '         JOIN (\n' +
-    '    SELECT CAST(CAST(SUM(review.stars) AS FLOAT) / COUNT(review.stars) AS NUMERIC(36, 2)) AS stars,\n' +
+    '    SELECT CAST(CASTSUM(review.stars) AS FLOAT) / COUNT(review.stars) AS NUMERIC(36, 2)) AS stars,\n' +
     '           r.id_room                                                                      AS id_room\n' +
     '    FROM review\n' +
     '             JOIN room r ON review.id_room = r.id_room\n' +
